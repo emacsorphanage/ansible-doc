@@ -54,6 +54,7 @@
 (defun ansible-doc-modules ()
   "Get a list of all known Ansible modules."
   (unless ansible-doc--modules
+    (message "Finding Ansible modules...")
     (with-temp-buffer
       (call-process "ansible-doc" nil '(t nil) nil "--list")
       (goto-char (point-max))
