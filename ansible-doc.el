@@ -5,7 +5,7 @@
 ;; Author: Sebastian Wiesner <swiesner@lunaryorn>
 ;; URL: https://github.com/lunaryorn/ansible-doc.el
 ;; Keywords: tools, help
-;; Version: 0.1-cvs
+;; Version: 0.1
 ;; Package-Requires: ((emacs "24.1"))
 
 ;; This file is part of GNU Emacs.
