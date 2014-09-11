@@ -116,7 +116,7 @@ Ansible documentation lookup:
 \\{ansible-doc-mode-map}"
   :init-value nil
   :keymap ansible-doc-mode-map
-  :lighter "ADoc"
+  :lighter " ADoc"
   :group 'ansible-doc
   :require 'ansible-doc)
 
