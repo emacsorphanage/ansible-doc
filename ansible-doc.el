@@ -71,7 +71,7 @@
 (defun ansible-doc-read-module (prompt)
   "Read a Ansible module name from minibuffer with PROMPT."
   (let* ((modules (ansible-doc-modules))
-         (symbol (thing-at-point 'symbol 'no-properties))
+         (symbol (thing-at-point 'symbol))
          (default (if (member symbol modules) symbol nil))
          (reply (completing-read prompt modules nil 'require-match
                                  nil nil default)))
