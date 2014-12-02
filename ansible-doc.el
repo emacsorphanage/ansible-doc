@@ -56,7 +56,8 @@
   (unless ansible-doc--modules
     (message "Finding Ansible modules...")
     (with-temp-buffer
-      (call-process "ansible-doc" nil '(t nil) nil "--list")
+      (unless (equal (call-process "ansible-doc" nil t nil "--list") 0)
+        (error "Failed to get a list of ansible modules: %s" (buffer-string)))
       (goto-char (point-max))
       (while (re-search-backward (rx line-start
                                      (group (one-or-more (not (any space))))
