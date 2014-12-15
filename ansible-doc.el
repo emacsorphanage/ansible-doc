@@ -173,6 +173,22 @@
                  'type 'ansible-doc-module-xref
                  'ansible-module (match-string 1))))
 
+(defun ansible-module-doc-revert-buffer (_ignore-auto noconfirm)
+  "Revert an Ansible Module doc buffer."
+  (let ((module ansible-module-doc-current-module)
+        (old-pos (point)))
+    (unless module
+      (error "This buffer does not document an Ansible module"))
+    (when (or noconfirm
+              (y-or-n-p (format "Reload documentation for %s? " module)))
+      (message "Loading documentation for module %s" module)
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (call-process "ansible-doc" nil t t module))
+      (font-lock-ensure)
+      (force-mode-line-update)
+      (goto-char old-pos))))
+
 (defvar ansible-module-doc-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map (make-composed-keymap button-buffer-map
@@ -190,7 +206,8 @@
         mode-line-buffer-identification
         (list (default-value 'mode-line-buffer-identification)
               " {" 'ansible-module-doc-current-module "}")
-        font-lock-defaults '((ansible-module-doc-font-lock-keywords) t nil)))
+        font-lock-defaults '((ansible-module-doc-font-lock-keywords) t nil))
+  (setq-local revert-buffer-function #'ansible-module-doc-revert-buffer))
 
 ;;;###autoload
 (defun ansible-doc (module)
@@ -204,12 +221,7 @@
       (with-current-buffer buffer
         (ansible-module-doc-mode)
         (setq ansible-module-doc-current-module module)
-        (let ((inhibit-read-only t))
-          (erase-buffer)
-          (call-process "ansible-doc" nil t t module))
-        (font-lock-ensure)
-        (force-mode-line-update)
-        (goto-char (point-min))))
+        (revert-buffer nil 'noconfirm)))
     (pop-to-buffer buffer)))
 
 (defvar ansible-doc-mode-map
