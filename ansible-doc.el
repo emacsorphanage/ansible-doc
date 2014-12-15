@@ -122,7 +122,7 @@
         buffer-read-only t
         mode-line-buffer-identification
         (list (default-value 'mode-line-buffer-identification)
-              " {" '(:eval ansible-module-doc-current-module) "}")
+              " {" 'ansible-module-doc-current-module "}")
         font-lock-defaults '((ansible-module-doc-font-lock-keywords) t nil)))
 
 ;;;###autoload
@@ -141,6 +141,7 @@
           (erase-buffer)
           (call-process "ansible-doc" nil t t module))
         (font-lock-ensure)
+        (force-mode-line-update)
         (goto-char (point-min))))
     (pop-to-buffer buffer)))
 
