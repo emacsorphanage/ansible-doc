@@ -197,6 +197,10 @@ buffer-local wherever it is set."
     (ansible-doc-propertize-module-xrefs . nil))
   "Font lock keywords for Ansible module documentation.")
 
+(defconst ansible-module-doc-imenu-generic-expression
+  `(("Options" ,(rx line-start (or "-" "=") " "
+                    (group (1+ (not (any space)))) line-end) 1)))
+
 (defun ansible-doc-propertize-module-xrefs (limit)
   "Propertize all module xrefs between point and LIMIT."
   (remove-overlays (point) limit)
@@ -255,7 +259,8 @@ buffer-local wherever it is set."
         mode-line-buffer-identification
         (list (default-value 'mode-line-buffer-identification)
               " {" 'ansible-module-doc-current-module "}")
-        font-lock-defaults '((ansible-module-doc-font-lock-keywords) t nil))
+        font-lock-defaults '((ansible-module-doc-font-lock-keywords) t nil)
+        imenu-generic-expression ansible-module-doc-imenu-generic-expression)
   (setq-local revert-buffer-function #'ansible-module-doc-revert-buffer)
   (setq-local bookmark-make-record-function
               #'ansible-module-doc-make-bookmark-record))
