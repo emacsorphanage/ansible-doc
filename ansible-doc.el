@@ -46,6 +46,9 @@
 (declare-function bookmark-default-handler "bookmark" (bmk))
 (declare-function bookmark-get-bookmark-record "bookmark" (bmk))
 
+;;; YAML Mode
+(declare-function yaml-mode "yaml-mode" nil)
+
 (eval-and-compile
   ;; `defvar-local' Emacs 24.2 and below
   (unless (fboundp 'defvar-local)
@@ -217,22 +220,24 @@ buffer-local wherever it is set."
 
 Return a fontified copy of TEXT."
   ;; Graciously inspired by http://emacs.stackexchange.com/a/5408/227
-  (with-temp-buffer
-    (erase-buffer)
-    (insert text)
-    ;; Run YAML Mode without any hooks
-    (delay-mode-hooks
-      (yaml-mode)
-      (font-lock-mode))
-    (font-lock-ensure)
-    ;; Convert `face' to `font-lock-face' to play nicely with font lock
-    (goto-char (point-min))
-    (while (not (eobp))
-      (let ((pos (point)))
-        (goto-char (next-single-property-change pos 'face nil (point-max)))
-        (put-text-property pos (point) 'font-lock-face
-                           (get-text-property pos 'face))))
-    (buffer-string)))
+  (if (not (fboundp 'yaml-mode))
+      text
+    (with-temp-buffer
+      (erase-buffer)
+      (insert text)
+      ;; Run YAML Mode without any hooks
+      (delay-mode-hooks
+        (yaml-mode)
+        (font-lock-mode))
+      (font-lock-ensure)
+      ;; Convert `face' to `font-lock-face' to play nicely with font lock
+      (goto-char (point-min))
+      (while (not (eobp))
+        (let ((pos (point)))
+          (goto-char (next-single-property-change pos 'face nil (point-max)))
+          (put-text-property pos (point) 'font-lock-face
+                             (get-text-property pos 'face))))
+      (buffer-string))))
 
 (defun ansible-doc-fontify-yaml-examples ()
   "Fontify YAML examples in the current buffer."
