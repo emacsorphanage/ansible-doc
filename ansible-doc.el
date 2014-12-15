@@ -80,6 +80,11 @@
   :group 'ansible-doc
   :package-version '(ansible-doc . "0.2"))
 
+(defface ansible-doc-literal '((t :inherit font-lock-string-face))
+  "Face for literals in Ansible documentation."
+  :group 'ansible-doc
+  :package-version '(ansible-doc . "0.2"))
+
 (defconst ansible-doc--buffer-name "*ansible-doc %s*"
   "Template for the names of Ansible Doc buffers.")
 
@@ -135,7 +140,8 @@
     (,(rx "(" (group "Choices:") (1+ (any space))
           (group (1+ (not (any ")")))) ")")
      (1 'ansible-doc-label)
-     (2 'ansible-doc-choices)))
+     (2 'ansible-doc-choices))
+    (,(rx "`" (group (1+ (not (any "'")))) "'") 1 'ansible-doc-literal))
   "Font lock keywords for Ansible module documentation.")
 
 (define-derived-mode ansible-module-doc-mode special-mode "ADoc"
