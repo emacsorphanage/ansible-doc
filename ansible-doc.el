@@ -37,6 +37,14 @@
 
 (require 'button)
 
+;;; Bookmark integration
+(defvar bookmark-make-record-function)
+(declare-function bookmark-make-record-default
+                  "bookmark" (&optional no-file no-context posn))
+(declare-function bookmark-prop-get "bookmark" (bookmark prop))
+(declare-function bookmark-default-handler "bookmark" (bmk))
+(declare-function bookmark-get-bookmark-record "bookmark" (bmk))
+
 (defgroup ansible nil
   "Ansible configuration and provisioning system."
   :group 'languages
@@ -142,6 +150,13 @@
 (defvar-local ansible-module-doc-current-module nil
   "The module documented by this buffer.")
 
+(defun ansible-module-doc-current-module ()
+  "Get the current module or error."
+  (let ((module ansible-module-doc-current-module))
+    (unless module
+      (error "This buffer does not document an Ansible module"))
+    module))
+
 (defconst ansible-module-doc-font-lock-keywords
   `((,(rx buffer-start "> " (1+ not-newline) line-end) 0 'ansible-doc-header)
     (,(rx line-start "Options (" (1+ not-newline) "):" line-end)
@@ -175,10 +190,8 @@
 
 (defun ansible-module-doc-revert-buffer (_ignore-auto noconfirm)
   "Revert an Ansible Module doc buffer."
-  (let ((module ansible-module-doc-current-module)
+  (let ((module (ansible-module-doc-current-module))
         (old-pos (point)))
-    (unless module
-      (error "This buffer does not document an Ansible module"))
     (when (or noconfirm
               (y-or-n-p (format "Reload documentation for %s? " module)))
       (message "Loading documentation for module %s" module)
@@ -188,6 +201,23 @@
       (font-lock-ensure)
       (force-mode-line-update)
       (goto-char old-pos))))
+
+(defun ansible-module-doc-make-bookmark-record ()
+  "Make a bookmark record for the current Ansible module."
+  (let ((module (ansible-module-doc-current-module)))
+    `(,(format "Ansible module %s" module)
+      ,@(bookmark-make-record-default 'no-file)
+      (ansible-module . ,module)
+      (handler . ansible-module-doc-bookmark-jump))))
+
+(defun ansible-module-doc-bookmark-jump (bookmark)
+  "Jump to an Ansible module BOOKMARK."
+  ;; Lets just obtain a buffer for the module, and delegate the rest to
+  ;; bookmark.el
+  (let* ((module (bookmark-prop-get bookmark 'ansible-module))
+         (buffer (ansible-doc-buffer module)))
+    (bookmark-default-handler
+     `("" (buffer . ,buffer) . ,(bookmark-get-bookmark-record bookmark)))))
 
 (defvar ansible-module-doc-mode-map
   (let ((map (make-sparse-keymap)))
@@ -207,13 +237,12 @@
         (list (default-value 'mode-line-buffer-identification)
               " {" 'ansible-module-doc-current-module "}")
         font-lock-defaults '((ansible-module-doc-font-lock-keywords) t nil))
-  (setq-local revert-buffer-function #'ansible-module-doc-revert-buffer))
+  (setq-local revert-buffer-function #'ansible-module-doc-revert-buffer)
+  (setq-local bookmark-make-record-function
+              #'ansible-module-doc-make-bookmark-record))
 
-;;;###autoload
-(defun ansible-doc (module)
-  "Show ansible documentation for MODULE."
-  (interactive
-   (list (ansible-doc-read-module "Documentation for Ansible Module: ")))
+(defun ansible-doc-buffer (module)
+  "Create a documentation buffer for MODULE."
   (let* ((buffer-name (format ansible-doc--buffer-name module))
          (buffer (get-buffer buffer-name)))
     (unless buffer
@@ -222,7 +251,14 @@
         (ansible-module-doc-mode)
         (setq ansible-module-doc-current-module module)
         (revert-buffer nil 'noconfirm)))
-    (pop-to-buffer buffer)))
+    buffer))
+
+;;;###autoload
+(defun ansible-doc (module)
+  "Show ansible documentation for MODULE."
+  (interactive
+   (list (ansible-doc-read-module "Documentation for Ansible Module: ")))
+  (pop-to-buffer (ansible-doc-buffer module)))
 
 (defvar ansible-doc-mode-map
   (let ((map (make-sparse-keymap)))
