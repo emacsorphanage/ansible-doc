@@ -1,3 +1,11 @@
+0.2 (in development)
+====================
+
+- Fontify Ansible documentation
+- Add buttons to follow references to other modules
+- Add support for bookmarks on Ansible documentation
+- Allow input even if no Ansible modules were found
+
 0.1 (Sep 11, 2014)
 ==================
 
