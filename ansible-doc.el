@@ -26,11 +26,13 @@
 
 ;;; Commentary:
 
-;; Ansible Documentation Minor Mode for GNU Emacs.
+;; Ansible documentation for GNU Emacs.
 ;;
-;; Provide `ansible-doc-mode' which enables documentation lookup for Ansible.
+;; Provide `ansible-doc' to view the documentation of an Ansible module in
+;; Emacs.
 ;;
-;; Enable with:
+;; Additionally provide `ansible-doc-mode' minor mode to add documentation
+;; lookup to YAML Mode. Enable with:
 ;;
 ;; (add-hook 'yaml-mode-hook #'ansible-doc-mode)
 
