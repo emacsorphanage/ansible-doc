@@ -166,17 +166,17 @@ buffer-local wherever it is set."
   'action #'ansible-doc-follow-module-xref
   'help-echo "mouse-2, RET: visit module")
 
-(defvar-local ansible-module-doc-current-module nil
+(defvar-local ansible-doc-current-module nil
   "The module documented by this buffer.")
 
-(defun ansible-module-doc-current-module ()
+(defun ansible-doc-current-module ()
   "Get the current module or error."
-  (let ((module ansible-module-doc-current-module))
+  (let ((module ansible-doc-current-module))
     (unless module
       (error "This buffer does not document an Ansible module"))
     module))
 
-(defconst ansible-module-doc-font-lock-keywords
+(defconst ansible-doc-module-font-lock-keywords
   `((,(rx buffer-start "> " (1+ not-newline) line-end) 0 'ansible-doc-header)
     (,(rx line-start "Options (" (1+ not-newline) "):" line-end)
      0 'ansible-doc-section)
@@ -198,7 +198,7 @@ buffer-local wherever it is set."
     (ansible-doc-propertize-module-xrefs . nil))
   "Font lock keywords for Ansible module documentation.")
 
-(defconst ansible-module-doc-imenu-generic-expression
+(defconst ansible-doc-module-imenu-generic-expression
   `(("Options" ,(rx line-start (or "-" "=") " "
                     (group (1+ (not (any space)))) line-end) 1)))
 
@@ -212,9 +212,9 @@ buffer-local wherever it is set."
                  'type 'ansible-doc-module-xref
                  'ansible-module (match-string 1))))
 
-(defun ansible-module-doc-revert-buffer (_ignore-auto noconfirm)
+(defun ansible-doc-revert-module-buffer (_ignore-auto noconfirm)
   "Revert an Ansible Module doc buffer."
-  (let ((module (ansible-module-doc-current-module))
+  (let ((module (ansible-doc-current-module))
         (old-pos (point)))
     (when (or noconfirm
               (y-or-n-p (format "Reload documentation for %s? " module)))
@@ -226,15 +226,15 @@ buffer-local wherever it is set."
       (force-mode-line-update)
       (goto-char old-pos))))
 
-(defun ansible-module-doc-make-bookmark-record ()
+(defun ansible-doc-make-module-bookmark ()
   "Make a bookmark record for the current Ansible module."
-  (let ((module (ansible-module-doc-current-module)))
+  (let ((module (ansible-doc-current-module)))
     `(,(format "Ansible module %s" module)
       ,@(bookmark-make-record-default 'no-file)
       (ansible-module . ,module)
-      (handler . ansible-module-doc-bookmark-jump))))
+      (handler . ansible-doc-jump-module-bookmark))))
 
-(defun ansible-module-doc-bookmark-jump (bookmark)
+(defun ansible-doc-jump-module-bookmark (bookmark)
   "Jump to an Ansible module BOOKMARK."
   ;; Lets just obtain a buffer for the module, and delegate the rest to
   ;; bookmark.el
@@ -243,28 +243,28 @@ buffer-local wherever it is set."
     (bookmark-default-handler
      `("" (buffer . ,buffer) . ,(bookmark-get-bookmark-record bookmark)))))
 
-(defvar ansible-module-doc-mode-map
+(defvar ansible-doc-module-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map (make-composed-keymap button-buffer-map
                                                  special-mode-map))
     map)
-  "Keymap for `ansible-module-doc-mode'.")
+  "Keymap for `ansible-doc-module-mode'.")
 
-(define-derived-mode ansible-module-doc-mode special-mode "ADoc"
+(define-derived-mode ansible-doc-module-mode special-mode "ADoc Module"
   "A major mode for Ansible module documentation.
 
-\\{ansible-module-doc-mode-map}"
+\\{ansible-doc-module-mode-map}"
   (setq buffer-auto-save-file-name nil
         truncate-lines t
         buffer-read-only t
         mode-line-buffer-identification
         (list (default-value 'mode-line-buffer-identification)
-              " {" 'ansible-module-doc-current-module "}")
-        font-lock-defaults '((ansible-module-doc-font-lock-keywords) t nil)
-        imenu-generic-expression ansible-module-doc-imenu-generic-expression)
-  (setq-local revert-buffer-function #'ansible-module-doc-revert-buffer)
+              " {" 'ansible-doc-current-module "}")
+        font-lock-defaults '((ansible-doc-module-font-lock-keywords) t nil)
+        imenu-generic-expression ansible-doc-module-imenu-generic-expression)
+  (setq-local revert-buffer-function #'ansible-doc-revert-module-buffer)
   (setq-local bookmark-make-record-function
-              #'ansible-module-doc-make-bookmark-record)
+              #'ansible-doc-make-module-bookmark)
   (imenu-add-to-menubar "Contents"))
 
 (defun ansible-doc-buffer (module)
@@ -274,8 +274,8 @@ buffer-local wherever it is set."
     (unless buffer
       (setq buffer (get-buffer-create buffer-name))
       (with-current-buffer buffer
-        (ansible-module-doc-mode)
-        (setq ansible-module-doc-current-module module)
+        (ansible-doc-module-mode)
+        (setq ansible-doc-current-module module)
         (revert-buffer nil 'noconfirm)))
     buffer))
 
