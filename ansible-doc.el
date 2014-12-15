@@ -65,6 +65,21 @@
   :group 'ansible-doc
   :package-version '(ansible-doc . "0.2"))
 
+(defface ansible-doc-label '((t :inherit font-lock-doc-face))
+  "Face for a label in Ansible documentation."
+  :group 'ansible-doc
+  :package-version '(ansible-doc . "0.2"))
+
+(defface ansible-doc-default '((t :inherit font-lock-constant-face))
+  "Face for default values in Ansible documentation."
+  :group 'ansible-doc
+  :package-version '(ansible-doc . "0.2"))
+
+(defface ansible-doc-choices '((t :inherit font-lock-constant-face))
+  "Face for choice values in Ansible documentation."
+  :group 'ansible-doc
+  :package-version '(ansible-doc . "0.2"))
+
 (defconst ansible-doc--buffer-name "*ansible-doc %s*"
   "Template for the names of Ansible Doc buffers.")
 
@@ -112,7 +127,15 @@
     (,(rx line-start "- " (1+ (not (any space))) line-end)
      0 'ansible-doc-option)
     (,(rx line-start "= " (1+ (not (any space))) line-end)
-     0 'ansible-doc-mandatory-option))
+     0 'ansible-doc-mandatory-option)
+    (,(rx "[" (group "Default:") (1+ (any space))
+          (group (1+ (not (any "]")))) "]")
+     (1 'ansible-doc-label)
+     (2 'ansible-doc-default))
+    (,(rx "(" (group "Choices:") (1+ (any space))
+          (group (1+ (not (any ")")))) ")")
+     (1 'ansible-doc-label)
+     (2 'ansible-doc-choices)))
   "Font lock keywords for Ansible module documentation.")
 
 (define-derived-mode ansible-module-doc-mode special-mode "ADoc"
