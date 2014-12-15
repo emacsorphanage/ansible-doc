@@ -263,7 +263,8 @@ buffer-local wherever it is set."
         imenu-generic-expression ansible-module-doc-imenu-generic-expression)
   (setq-local revert-buffer-function #'ansible-module-doc-revert-buffer)
   (setq-local bookmark-make-record-function
-              #'ansible-module-doc-make-bookmark-record))
+              #'ansible-module-doc-make-bookmark-record)
+  (imenu-add-to-menubar "Contents"))
 
 (defun ansible-doc-buffer (module)
   "Create a documentation buffer for MODULE."
