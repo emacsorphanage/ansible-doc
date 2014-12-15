@@ -2,6 +2,8 @@ ansible-doc
 ===========
 
 [![License GPL 3][badge-license]][copying]
+[![MELPA Stable][badge-melpa-stable]](http://stable.melpa.org/#/ansible-doc)
+[![MELPA][badge-melpa]](http://melpa.org/#/ansible-doc)
 
 Ansible documentation lookup for GNU Emacs:
 
@@ -9,8 +11,9 @@ Ansible documentation lookup for GNU Emacs:
 
 [badge-license]: https://img.shields.io/badge/license-GPL_3-green.svg?dummy
 [COPYING]: https://github.com/lunaryorn/ansible-doc.el/blob/master/COPYING
-[screenshot]:
-https://raw.githubusercontent.com/lunaryorn/ansible-doc.el/master/screenshot.png
+[screenshot]: https://raw.githubusercontent.com/lunaryorn/ansible-doc.el/master/screenshot.png
+[badge-melpa-stable]: http://stable.melpa.org/packages/ansible-doc-badge.svg
+[badge-melpa]: http://melpa.org/packages/ansible-doc-badge.svg
 
 Installation
 ------------
