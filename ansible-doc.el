@@ -35,6 +35,8 @@
 
 ;;; Code:
 
+(require 'button)
+
 (defgroup ansible nil
   "Ansible configuration and provisioning system."
   :group 'languages
@@ -85,6 +87,12 @@
   :group 'ansible-doc
   :package-version '(ansible-doc . "0.2"))
 
+(defface ansible-doc-module-xref '((t :inherit font-lock-type-face
+                                      :underline t))
+  "Face for module references in Ansible documentation."
+  :group 'ansible-doc
+  :package-version '(ansible-doc . "0.2"))
+
 (defconst ansible-doc--buffer-name "*ansible-doc %s*"
   "Template for the names of Ansible Doc buffers.")
 
@@ -121,6 +129,16 @@
                                  nil nil default)))
     (if (string= reply "") default reply)))
 
+(defun ansible-doc-follow-module-xref (button)
+  "Follow a module xref at BUTTON."
+  (let ((module (button-get button 'ansible-module)))
+    (ansible-doc module)))
+
+(define-button-type 'ansible-doc-module-xref
+  'face 'ansible-doc-module-xref
+  'action #'ansible-doc-follow-module-xref
+  'help-echo "mouse-2, RET: visit module")
+
 (defvar-local ansible-module-doc-current-module nil
   "The module documented by this buffer.")
 
@@ -141,11 +159,24 @@
           (group (1+ (not (any ")")))) ")")
      (1 'ansible-doc-label)
      (2 'ansible-doc-choices))
-    (,(rx "`" (group (1+ (not (any "'")))) "'") 1 'ansible-doc-literal))
+    (,(rx "`" (group (1+ (not (any "'")))) "'") 1 'ansible-doc-literal)
+    (ansible-doc-propertize-module-xrefs . nil))
   "Font lock keywords for Ansible module documentation.")
 
+(defun ansible-doc-propertize-module-xrefs (limit)
+  "Propertize all module xrefs between point and LIMIT."
+  (remove-overlays (point) limit)
+  (while (re-search-forward (rx "[" (group (1+ (not (any space "]")))) "]")
+                            limit 'noerror)
+    (make-button (match-beginning 0)
+                 (match-end 0)
+                 'type 'ansible-doc-module-xref
+                 'ansible-module (match-string 1))))
+
 (define-derived-mode ansible-module-doc-mode special-mode "ADoc"
-  "A major mode for Ansible module documentation."
+  "A major mode for Ansible module documentation.
+
+\\{ansible-module-doc-mode-map}"
   (setq buffer-auto-save-file-name nil
         truncate-lines t
         buffer-read-only t
