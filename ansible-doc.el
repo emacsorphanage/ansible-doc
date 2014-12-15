@@ -81,6 +81,23 @@
                                  nil nil default)))
     (if (string= reply "") default reply)))
 
+(defvar-local ansible-module-doc-current-module nil
+  "The module documented by this buffer.")
+
+(defconst ansible-module-doc-font-lock-keywords
+  nil
+  "Font lock keywords for Ansible module documentation.")
+
+(define-derived-mode ansible-module-doc-mode special-mode "ADoc"
+  "A major mode for Ansible module documentation."
+  (setq buffer-auto-save-file-name nil
+        truncate-lines t
+        buffer-read-only t
+        mode-line-buffer-identification
+        (list (default-value 'mode-line-buffer-identification)
+              " {" '(:eval ansible-module-doc-current-module) "}")
+        font-lock-defaults '((ansible-module-doc-font-lock-keywords) t nil)))
+
 ;;;###autoload
 (defun ansible-doc (module)
   "Show ansible documentation for MODULE."
@@ -91,12 +108,14 @@
     (unless buffer
       (setq buffer (get-buffer-create buffer-name))
       (with-current-buffer buffer
-        (setq buffer-read-only t)
+        (ansible-module-doc-mode)
+        (setq ansible-module-doc-current-module module)
         (let ((inhibit-read-only t))
           (erase-buffer)
           (call-process "ansible-doc" nil t t module))
+        (font-lock-ensure)
         (goto-char (point-min))))
-    (view-buffer-other-window buffer)))
+    (pop-to-buffer buffer)))
 
 (defvar ansible-doc-mode-map
   (let ((map (make-sparse-keymap)))
