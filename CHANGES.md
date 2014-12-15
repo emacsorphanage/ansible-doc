@@ -1,5 +1,5 @@
-0.2 (in development)
-====================
+0.2 (Dec 15, 2014)
+==================
 
 - Fontify Ansible documentation
 - Fontify YAML examples in documentation
