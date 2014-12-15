@@ -76,7 +76,8 @@
   (let* ((modules (ansible-doc-modules))
          (symbol (thing-at-point 'symbol))
          (default (if (member symbol modules) symbol nil))
-         (reply (completing-read prompt modules nil 'require-match
+         ;; If we have no modules available, we don't require a match.
+         (reply (completing-read prompt modules nil (not (null modules))
                                  nil nil default)))
     (if (string= reply "") default reply)))
 
