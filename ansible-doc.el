@@ -45,6 +45,26 @@
   :group 'ansible
   :prefix 'ansible-doc)
 
+(defface ansible-doc-header '((t :inherit bold))
+  "Face for Ansible documentation header."
+  :group 'ansible-doc
+  :package-version '(ansible-doc . "0.2"))
+
+(defface ansible-doc-section '((t :inherit font-lock-keyword-face))
+  "Face for Ansible section headings."
+  :group 'ansible-doc
+  :package-version '(ansible-doc . "0.2"))
+
+(defface ansible-doc-option '((t :inherit font-lock-function-name-face))
+  "Face for options in Ansible documentation."
+  :group 'ansible-doc
+  :package-version '(ansible-doc . "0.2"))
+
+(defface ansible-doc-mandatory-option '((t :inherit font-lock-type-face))
+  "Face for mandatory options in Ansible documentation."
+  :group 'ansible-doc
+  :package-version '(ansible-doc . "0.2"))
+
 (defconst ansible-doc--buffer-name "*ansible-doc %s*"
   "Template for the names of Ansible Doc buffers.")
 
@@ -85,7 +105,14 @@
   "The module documented by this buffer.")
 
 (defconst ansible-module-doc-font-lock-keywords
-  nil
+  `((,(rx buffer-start "> " (1+ not-newline) line-end) 0 'ansible-doc-header)
+    (,(rx line-start "Options (" (1+ not-newline) "):" line-end)
+     0 'ansible-doc-section)
+    (,(rx line-start "Notes:  ") 0 'ansible-doc-section)
+    (,(rx line-start "- " (1+ (not (any space))) line-end)
+     0 'ansible-doc-option)
+    (,(rx line-start "= " (1+ (not (any space))) line-end)
+     0 'ansible-doc-mandatory-option))
   "Font lock keywords for Ansible module documentation.")
 
 (define-derived-mode ansible-module-doc-mode special-mode "ADoc"
