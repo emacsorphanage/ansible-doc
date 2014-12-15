@@ -173,6 +173,13 @@
                  'type 'ansible-doc-module-xref
                  'ansible-module (match-string 1))))
 
+(defvar ansible-module-doc-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map (make-composed-keymap button-buffer-map
+                                                 special-mode-map))
+    map)
+  "Keymap for `ansible-module-doc-mode'.")
+
 (define-derived-mode ansible-module-doc-mode special-mode "ADoc"
   "A major mode for Ansible module documentation.
 
