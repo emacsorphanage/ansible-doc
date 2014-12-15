@@ -2,6 +2,7 @@
 ====================
 
 - Fontify Ansible documentation
+- Fontify YAML examples in documentation
 - Add buttons to follow references to other modules
 - Add support for imenu (currently options only)
 - Add support for bookmarks on Ansible documentation

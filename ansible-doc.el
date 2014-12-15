@@ -212,6 +212,41 @@ buffer-local wherever it is set."
                  'type 'ansible-doc-module-xref
                  'ansible-module (match-string 1))))
 
+(defun ansible-doc-fontify-yaml (text)
+  "Add `font-lock-face' properties to YAML TEXT.
+
+Return a fontified copy of TEXT."
+  ;; Graciously inspired by http://emacs.stackexchange.com/a/5408/227
+  (with-temp-buffer
+    (erase-buffer)
+    (insert text)
+    ;; Run YAML Mode without any hooks
+    (delay-mode-hooks
+      (yaml-mode)
+      (font-lock-mode))
+    (font-lock-ensure)
+    ;; Convert `face' to `font-lock-face' to play nicely with font lock
+    (goto-char (point-min))
+    (while (not (eobp))
+      (let ((pos (point)))
+        (goto-char (next-single-property-change pos 'face nil (point-max)))
+        (put-text-property pos (point) 'font-lock-face
+                           (get-text-property pos 'face))))
+    (buffer-string)))
+
+(defun ansible-doc-fontify-yaml-examples ()
+  "Fontify YAML examples in the current buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward (rx line-start "# ") nil 'noerror)
+      (let* ((beg (match-beginning 0))
+             (end (point-max))
+             (text (buffer-substring-no-properties beg end))
+             (fontified (ansible-doc-fontify-yaml text)))
+        (delete-region beg end)
+        (goto-char beg)
+        (insert fontified)))))
+
 (defun ansible-doc-revert-module-buffer (_ignore-auto noconfirm)
   "Revert an Ansible Module doc buffer."
   (let ((module (ansible-doc-current-module))
@@ -221,7 +256,8 @@ buffer-local wherever it is set."
       (message "Loading documentation for module %s" module)
       (let ((inhibit-read-only t))
         (erase-buffer)
-        (call-process "ansible-doc" nil t t module))
+        (call-process "ansible-doc" nil t t module)
+        (ansible-doc-fontify-yaml-examples))
       (font-lock-ensure)
       (force-mode-line-update)
       (goto-char old-pos))))
