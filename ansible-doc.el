@@ -56,16 +56,19 @@
   (unless ansible-doc--modules
     (message "Finding Ansible modules...")
     (with-temp-buffer
-      (unless (equal (call-process "ansible-doc" nil t nil "--list") 0)
-        (error "Failed to get a list of ansible modules: %s" (buffer-string)))
-      (goto-char (point-max))
-      (while (re-search-backward (rx line-start
-                                     (group (one-or-more (not (any space))))
-                                     (any space)
-                                     (one-or-more not-newline)
-                                     line-end)
-                                 nil 'noerror)
-        (push (match-string 1) ansible-doc--modules))))
+      (when (with-demoted-errors "Error while finding Ansible modules: %S"
+              (let ((retcode (call-process "ansible-doc" nil t nil "--list")))
+                (unless (equal retcode 0)
+                  (error "Command ansible-doc --list failed with code %s, returned %s"
+                         retcode (buffer-string)))))
+        (goto-char (point-max))
+        (while (re-search-backward (rx line-start
+                                       (group (one-or-more (not (any space))))
+                                       (any space)
+                                       (one-or-more not-newline)
+                                       line-end)
+                                   nil 'noerror)
+          (push (match-string 1) ansible-doc--modules)))))
   ansible-doc--modules)
 
 (defun ansible-doc-read-module (prompt)
