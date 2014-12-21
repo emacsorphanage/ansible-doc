@@ -231,7 +231,12 @@ Return a fontified copy of TEXT."
       (delay-mode-hooks
         (yaml-mode)
         (font-lock-mode))
-      (font-lock-ensure)
+      (if (fboundp 'font-lock-ensure)
+          (font-lock-ensure)
+        (with-no-warnings
+          ;; Suppress warning about non-interactive use of
+          ;; `font-lock-fontify-buffer' in Emacs 25.
+          (font-lock-fontify-buffer)))
       ;; Convert `face' to `font-lock-face' to play nicely with font lock
       (goto-char (point-min))
       (while (not (eobp))
