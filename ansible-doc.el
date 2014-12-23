@@ -199,23 +199,24 @@ buffer-local wherever it is set."
           (group (1+ (not (any ")")))) ")")
      (1 'ansible-doc-label)
      (2 'ansible-doc-choices))
-    (,(rx "`" (group (1+ (not (any "'")))) "'") 1 'ansible-doc-literal)
-    (ansible-doc-propertize-module-xrefs . nil))
+    (,(rx "`" (group (1+ (not (any "'")))) "'") 1 'ansible-doc-literal))
   "Font lock keywords for Ansible module documentation.")
 
 (defconst ansible-doc-module-imenu-generic-expression
   `(("Options" ,(rx line-start (or "-" "=") " "
                     (group (1+ (not (any space)))) line-end) 1)))
 
-(defun ansible-doc-propertize-module-xrefs (limit)
+(defun ansible-doc-fontify-module-xrefs (beg end)
   "Propertize all module xrefs between point and LIMIT."
-  (remove-overlays (point) limit)
-  (while (re-search-forward (rx "[" (group (1+ (not (any space "]")))) "]")
-                            limit 'noerror)
-    (make-button (match-beginning 0)
-                 (match-end 0)
-                 'type 'ansible-doc-module-xref
-                 'ansible-module (match-string 1))))
+  (remove-overlays beg end)
+  (save-excursion
+    (goto-char beg)
+    (while (re-search-forward (rx "[" (group (1+ (not (any space "]")))) "]")
+                              end 'noerror)
+      (make-button (match-beginning 0)
+                   (match-end 0)
+                   'type 'ansible-doc-module-xref
+                   'ansible-module (match-string 1)))))
 
 (defun ansible-doc-fontify-yaml (text)
   "Add `font-lock-face' properties to YAML TEXT.
@@ -313,7 +314,8 @@ Return a fontified copy of TEXT."
   (setq-local revert-buffer-function #'ansible-doc-revert-module-buffer)
   (setq-local bookmark-make-record-function
               #'ansible-doc-make-module-bookmark)
-  (imenu-add-to-menubar "Contents"))
+  (imenu-add-to-menubar "Contents")
+  (jit-lock-register #'ansible-doc-fontify-module-xrefs))
 
 (defun ansible-doc-buffer (module)
   "Create a documentation buffer for MODULE."
