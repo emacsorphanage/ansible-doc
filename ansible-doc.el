@@ -271,7 +271,6 @@ Return a fontified copy of TEXT."
         (erase-buffer)
         (call-process "ansible-doc" nil t t module)
         (ansible-doc-fontify-yaml-examples))
-      (font-lock-ensure)
       (force-mode-line-update)
       (goto-char old-pos))))
 
