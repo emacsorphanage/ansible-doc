@@ -270,6 +270,8 @@ Return a fontified copy of TEXT."
       (let ((inhibit-read-only t))
         (erase-buffer)
         (call-process "ansible-doc" nil t t module)
+        (let ((delete-trailing-lines t))
+          (delete-trailing-whitespace))
         (ansible-doc-fontify-yaml-examples))
       (force-mode-line-update)
       (goto-char old-pos))))
