@@ -1,6 +1,6 @@
 ;;; ansible-doc.el --- Ansible documentation Minor Mode  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014  Sebastian Wiesner <swiesner@lunaryorn.com>
+;; Copyright (C) 2014, 2015  Sebastian Wiesner <swiesner@lunaryorn.com>
 ;; Copyright (C) 2013, 2014 Free Software Foundation, Inc.
 
 ;; Author: Sebastian Wiesner <swiesner@lunaryorn>
