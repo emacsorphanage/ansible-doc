@@ -155,9 +155,14 @@ buffer-local wherever it is set."
   "Read a Ansible module name from minibuffer with PROMPT."
   (let* ((modules (ansible-doc-modules))
          (symbol (thing-at-point 'symbol))
-         (default (if (member symbol modules) symbol nil))
-         ;; If we have no modules available, we don't require a match.
-         (reply (completing-read prompt modules nil (not (null modules))
+         (default (if (or (null modules) (member symbol modules))
+                      symbol
+                    nil))
+         ;; If we have no modules available, we don't require a match, and use
+         ;; the symbol at point as default value and sole completion candidate.
+         (reply (completing-read prompt
+                                 (or modules (list default))
+                                 nil (not (null modules))
                                  nil nil default)))
     (if (string= reply "") default reply)))
 
