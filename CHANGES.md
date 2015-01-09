@@ -1,5 +1,5 @@
-master (in development)
-=======================
+0.3 (Jan 09, 2015)
+==================
 
 - Fix void function error on Emacs 24.4 and below [GH-3]
 - Use symbol at point as only completion candidate if no Ansible modules were
