@@ -1,14 +1,19 @@
 EMACS = emacs
 EMACSFLAGS =
+EMACSBATCH = $(EMACS) -Q --batch $(EMACSFLAGS)
 
 SRCS = ansible-doc.el
 OBJS = $(SRCS:.el=.elc)
 
-PHONY: compile
+PHONY: compile test
 
 # Build targets
 compile: $(OBJS)
 
+test: $(OBJS)
+	$(EMACSBATCH) $(addprefix -l ,$(OBJS)) -l ansible-doc-test.el \
+		-f ert-run-tests-batch-and-exit
+
 # File targets
 %.elc : %.el
-	$(EMACS) -Q --batch $(EMACSFLAGS) -f batch-byte-compile $<
+	$(EMACSBATCH) -f batch-byte-compile $<
