@@ -140,7 +140,8 @@ buffer-local wherever it is set."
               (let ((retcode (call-process "ansible-doc" nil t nil "--list")))
                 (unless (equal retcode 0)
                   (error "Command ansible-doc --list failed with code %s, returned %s"
-                         retcode (buffer-string)))))
+                         retcode (buffer-string)))
+                retcode))
         (goto-char (point-max))
         (while (re-search-backward (rx line-start
                                        (group (one-or-more (not (any space))))
