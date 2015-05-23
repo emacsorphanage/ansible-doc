@@ -159,6 +159,9 @@ buffer-local wherever it is set."
          (default (if (or (null modules) (member symbol modules))
                       symbol
                     nil))
+         (prompt (if default
+                     (format "%s (default %s): " prompt default)
+                   (format "%s: " prompt)))
          ;; If we have no modules available, we don't require a match, and use
          ;; the symbol at point as default value and sole completion candidate.
          (reply (completing-read prompt
@@ -340,7 +343,7 @@ Return a fontified copy of TEXT."
 (defun ansible-doc (module)
   "Show ansible documentation for MODULE."
   (interactive
-   (list (ansible-doc-read-module "Documentation for Ansible Module: ")))
+   (list (ansible-doc-read-module "Documentation for Ansible Module")))
   (pop-to-buffer (ansible-doc-buffer module)))
 
 (defvar ansible-doc-mode-map
