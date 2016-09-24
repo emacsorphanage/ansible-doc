@@ -1,13 +1,12 @@
 ;;; ansible-doc.el --- Ansible documentation Minor Mode  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2014, 2015  Sebastian Wiesner <swiesner@lunaryorn.com>
-;; Copyright (C) 2013, 2014 Free Software Foundation, Inc.
+;; Copyright (C) 2014-2016  Sebastian Wiesner <swiesner@lunaryorn.com>
 
 ;; Author: Sebastian Wiesner <swiesner@lunaryorn>
 ;; URL: https://github.com/lunaryorn/ansible-doc.el
 ;; Keywords: tools, help
 ;; Version: 0.4-cvs
-;; Package-Requires: ((emacs "24.1"))
+;; Package-Requires: ((emacs "24.3"))
 
 ;; This file is part of GNU Emacs.
 
@@ -50,24 +49,6 @@
 
 ;;; YAML Mode
 (declare-function yaml-mode "yaml-mode" nil)
-
-(eval-and-compile
-  ;; `defvar-local' Emacs 24.2 and below
-  (unless (fboundp 'defvar-local)
-    (defmacro defvar-local (var val &optional docstring)
-      "Define VAR as a buffer-local variable with default value VAL.
-Like `defvar' but additionally marks the variable as being automatically
-buffer-local wherever it is set."
-      (declare (debug defvar) (doc-string 3))
-      `(progn
-         (defvar ,var ,val ,docstring)
-         (make-variable-buffer-local ',var))))
-
-  (unless (fboundp 'setq-local)
-    ;; `setq-local' for Emacs 24.2 and below
-    (defmacro setq-local (var val)
-      "Set variable VAR to value VAL in current buffer."
-      `(set (make-local-variable ',var) ,val))))
 
 (defgroup ansible nil
   "Ansible configuration and provisioning system."

@@ -3,6 +3,7 @@ master (in development)
 
 - Fix completion for module names [GH-5]
 - Show the guessed default module in prompt [GH-6]
+- Require Emacs 24.3 or newer
 
 0.3 (Jan 09, 2015)
 ==================
