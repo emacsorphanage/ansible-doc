@@ -31,7 +31,7 @@
 ;; Emacs.
 ;;
 ;; Additionally provide `ansible-doc-mode' minor mode to add documentation
-;; lookup to YAML Mode. Enable with:
+;; lookup to YAML Mode.  Enable with:
 ;;
 ;; (add-hook 'yaml-mode-hook #'ansible-doc-mode)
 
@@ -197,7 +197,7 @@
                     (group (1+ (not (any space)))) line-end) 1)))
 
 (defun ansible-doc-fontify-module-xrefs (beg end)
-  "Propertize all module xrefs between point and LIMIT."
+  "Propertize all module xrefs between BEG and END."
   (remove-overlays beg end)
   (save-excursion
     (goto-char beg)
@@ -210,6 +210,9 @@
 
 (defun ansible-doc-fontify-yaml (text)
   "Add `font-lock-face' properties to YAML TEXT.
+
+If `yaml-mode' is bound as a function use it to fontify TEXT as
+YAML, otherwise return TEXT unchanged.
 
 Return a fontified copy of TEXT."
   ;; Graciously inspired by http://emacs.stackexchange.com/a/5408/227
@@ -251,7 +254,9 @@ Return a fontified copy of TEXT."
         (insert fontified)))))
 
 (defun ansible-doc-revert-module-buffer (_ignore-auto noconfirm)
-  "Revert an Ansible Module doc buffer."
+  "Revert an Ansible Module doc buffer.
+
+If NOCONFIRM is non-nil revert without prompt."
   (let ((module (ansible-doc-current-module))
         (old-pos (point)))
     (when (or noconfirm
