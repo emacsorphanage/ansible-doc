@@ -1,5 +1,5 @@
-master (in development)
-=======================
+0.4 (Sep 24, 2016)
+==================
 
 - Fix completion for module names [GH-5]
 - Show the guessed default module in prompt [GH-6]
