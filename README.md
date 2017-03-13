@@ -1,6 +1,7 @@
 ansible-doc
 ===========
 
+![Maintenance](https://img.shields.io/maintenance/yes/2016.svg)
 [![License GPL 3][badge-license]][copying]
 [![MELPA Stable][badge-melpa-stable]](http://stable.melpa.org/#/ansible-doc)
 [![MELPA][badge-melpa]](http://melpa.org/#/ansible-doc)
